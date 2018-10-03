@@ -1,0 +1,18 @@
+Christopher Shorter
+HW5
+
+1. Here is sample output from the programs. I used -500-500 as my range for both x and y
+
+	problem1.c:
+		chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./problem1 
+		main : min=-186.697431
+		thread : min=-186.729959
+		Total time was 1.138027 seconds.
+		minimum = -186.729959
+
+	shubert.c:
+		chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./shubert 
+		Total time was 3.264000 seconds.
+		minimum = -186.729959
+		
+2.
