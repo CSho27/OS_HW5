@@ -61,8 +61,6 @@ int main()
 	}
 	waitpid(-1, NULL, 0);
 	waitpid(-1, NULL, 0);
-	printf("%d\n", index);
-	fflush(stdout);
 	
 	if(index == 0){
 		ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);

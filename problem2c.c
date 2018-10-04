@@ -12,90 +12,72 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
 
-void shubertRun(int begin, int end, int index);
+
+
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <netdb.h> 
+
+double shubertRun(int begin, int end);
 double shubert(double x1, double x2);
+
+void error(const char *msg) {
+    perror(msg);
+    exit(1);
+}
 
 int main()
 {
 	struct timeval start_time, stop_time, elapsed_time;  // timers
   	gettimeofday(&start_time,NULL); // Unix timer
 	
-	pid_t pid = 0;
-	int index = 0;
-	
-	const int SIZE = 4096;
-    const char *name = "minArray";
-	
-	int shm_fd;
-    void *ptr;
-    
-    shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);
-    ftruncate(shm_fd, SIZE);
-	
-	ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-    if (ptr == MAP_FAILED) {
-        printf("Map failed\n");
-    }
-	
-	pid = fork();
-	
-	if(pid == 0){
-		index = 1;
-		shubertRun(-500, -250, index);
+	char* buffer[1024];
+	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+     if (sockfd < 0) 
+        error("ERROR opening socket");
+     struct sockaddr_in serv_addr; // Server address struct
+     bzero((char *) &serv_addr, sizeof(serv_addr));
+     int portno = 8081; // Port number is commandline argument
+     serv_addr.sin_family = AF_INET;
+     serv_addr.sin_addr.s_addr = INADDR_ANY;
+     serv_addr.sin_port = htons(portno);
+     if (bind(sockfd, (struct sockaddr *) &serv_addr,
+              sizeof(serv_addr)) < 0) 
+          error("ERROR on binding");
+     listen(sockfd, 5);
+
+     // Service phase
+     struct sockaddr_in cli_addr;
+     socklen_t clilen = sizeof(cli_addr); // Address struct length
+     int sockfd_array[3];
+	 int i = 0;
+	 for(; i<3; i++){
+		 sockfd_array[i] = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);
+		 if (sockfd_array[i] < 0) 
+			  error("ERROR on accept");
+	 }
+	 double local_min = shubertRun(250, 500);
+	double min = local_min;
+	i = 0;
+	for(; i<3; i++){
+	 	read(sockfd_array[i], buffer, sizeof(buffer));
+		double check = atof((char*)buffer);
+		if(check<min)
+			check = min;
 	}
-	else{
-		shubertRun(-250, 0, index);
-	}
-	
-	pid = fork();
-	if(pid == 0 && index == 0){
-		index = 2;
-		shubertRun(0, 250, index);
-	}
-	else{
-		if(pid == 0 && index == 1){
-			index = 3;
-			shubertRun(250, 500, index);
-		}
-	}
-	waitpid(-1, NULL, 0);
-	waitpid(-1, NULL, 0);
-	printf("%d\n", index);
-	fflush(stdout);
-	
-	if(index == 0){
-		ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-		if (ptr == MAP_FAILED) {
-			printf("Map failed receive\n");
-			return -1;
-		}
-		
-		double min = atof(ptr);
-		
-		gettimeofday(&stop_time,NULL);
-		timersub(&stop_time, &start_time, &elapsed_time); // Unix time subtract routine
-		printf("Total time was %f seconds.\n", elapsed_time.tv_sec+elapsed_time.tv_usec/1000000.0);
-		printf("minimum = %f\n", min);
-	}
+     gettimeofday(&stop_time,NULL);
+ 	 timersub(&stop_time, &start_time, &elapsed_time); // Unix time subtract routine
+   	 printf("Total time was %f seconds.\n", elapsed_time.tv_sec+elapsed_time.tv_usec/1000000.0);
+	 printf("minimum = %f\n", min);
 }
 
-void shubertRun (int begin, int end, int index) {
-	const int SIZE = 4096;
-	int shm_fd;
-    void *ptr;
-	const char *name = "minArray";
-    
-    shm_fd = shm_open(name, O_RDWR, 0666);
-    if(shm_fd ==-1){
-        printf("shared memory failed \n");
-        exit(-1);
-    }
-	ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-    if (ptr == MAP_FAILED) {
-        printf("Map failed\n");
-    }
-		
+double shubertRun (int begin, int end) {
 	double x1, x2, y, local_min = 0;
  	// Loops 
  	for (x1 = begin; x1 <= end; x1 += 0.5) { // x1 parameter of Shubert function
@@ -106,11 +88,11 @@ void shubertRun (int begin, int end, int index) {
        	local_min = y;
 		}
 	}
-	if(local_min<atof(ptr)){
-		sprintf(ptr, "%f", local_min);
+	
+	return local_min;
+		
 	  
-    //printf("\n"); // Print on next row
- 	}
+    //printf("\n"); // Print on next r
 }
 
 

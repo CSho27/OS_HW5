@@ -15,4 +15,36 @@ HW5
 		Total time was 3.264000 seconds.
 		minimum = -186.729959
 		
-2.
+2. Same numbers used as in the sample program above, so output for shubert.c is the same.
+a.
+	chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./problem2a
+	Total time was 0.547695 seconds.
+	minimum = -186.677293
+	
+b.
+
+
+c.	Alright, not gonna lie I probably could've come up with a better way to do this, however, I can confirm manually starting and running 4 separate programs works.
+It's really just a client and a server where the client takes in an index corresponding to the range it will test, but still. Pretty impractical.
+
+Server: 
+	chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./problem2c
+	Total time was 75.139438 seconds.
+	minimum = -186.676443
+
+Clients:
+	chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./problem2c_client 0
+	chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./problem2c_client 1
+	chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./problem2c_client 2
+	
+	Very ugly but it defintiely worked.
+
+
+
+d.
+	chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./problem2d
+	Total time was 0.538435 seconds.
+	minimum = -186.676443
+
+	
+
