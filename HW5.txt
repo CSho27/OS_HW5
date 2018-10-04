@@ -21,7 +21,11 @@ a.
 	Total time was 0.547695 seconds.
 	minimum = -186.677293
 	
-b.
+b. Ok, for this one I'm not sure why it's giving me an int instead of a double but it is reading and writing correctly
+	chris@chris-VirtualBox:~/Documents/OS/OS_HW5$ ./problem2b 
+	Total time was 0.532066 seconds.
+	minimum = -186.000000
+
 
 
 c.	Alright, not gonna lie I probably could've come up with a better way to do this, however, I can confirm manually starting and running 4 separate programs works.

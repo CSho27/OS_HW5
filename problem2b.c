@@ -25,7 +25,7 @@ int main()
 	struct timeval start_time, stop_time, elapsed_time;  // timers
   	gettimeofday(&start_time,NULL); // Unix timer
 	pid_t pid = 0;
-	int fd[4];
+	int fd[2];
 	int index = 0;
 	
 	/* create the pipe */
@@ -33,6 +33,7 @@ int main()
             fprintf(stderr,"Pipe failed");
             return 1;
     }
+
 	
 	
 	pid = fork();
@@ -59,19 +60,19 @@ int main()
 	waitpid(-1, NULL, 0);
 	waitpid(-1, NULL, 0);
 	
-	double min = 0;
-	char* minstr = malloc (10);
-	read(fd[1], minstr, 10-1);
-	minstr[10] ='\0';
-	printf("%s", minstr);
-	fflush(stdout);
-	min = atof(minstr);
-			
 	if(index == 0){
+		double min = 0;
+		close(fd[1]);
+		char* minstr = malloc (10);
+		read(fd[0], minstr, 10-1);
+		close(fd[0]);
+		minstr[10] ='\0';
+		fflush(stdout);
+		min = atof(minstr);
 		gettimeofday(&stop_time,NULL);
-		timersub(&stop_time, &start_time, &elapsed_time); // Unix time subtract routine
+		timersub(&stop_time, &start_time, &elapsed_time); // Unix time subtract routine;
 		printf("Total time was %f seconds.\n", elapsed_time.tv_sec+elapsed_time.tv_usec/1000000.0);
-		printf("minimum = %f\n", min);
+		printf("minimum = %lf\n", min);
 	}
 }
 
@@ -93,8 +94,9 @@ void shubertRun (int begin, int end, int index, int fd[]) {
 	double min = atof(minstr);
 	
 	if(local_min<min){
-		sprintf(write_data, "%f", local_min);
+		sprintf(write_data, "%lf", local_min);
 		write(fd[1], write_data, sizeof(write_data));
+		close(fd[1]);
 	}
 	  
     //printf("\n"); // Print on next row
